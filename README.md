@@ -1,8 +1,13 @@
-## Build
+## Build base components
+
+Clone and build individual components:
 
 ### Hydra
 
 ```sh
+mkdir -p $GOPATH/src/github.com/ory/hydra
+cd $GOPATH/src/github.com/ory/hydra
+git clone https://github.com/ory/hydra.git .
 git checkout v1.10.1
 docker build -t ory-hydra:v1.10.1 -f .docker/Dockerfile-build .
 ```
@@ -10,6 +15,9 @@ docker build -t ory-hydra:v1.10.1 -f .docker/Dockerfile-build .
 ### Keto
 
 ```sh
+mkdir -p $GOPATH/src/github.com/ory/keto
+cd $GOPATH/src/github.com/ory/keto
+git clone https://github.com/ory/keto.git .
 git checkout v0.6.0-alpha.1
 docker build -t ory-keto:v0.6.0-alpha.1 -f .docker/Dockerfile-build .
 ```
@@ -17,27 +25,21 @@ docker build -t ory-keto:v0.6.0-alpha.1 -f .docker/Dockerfile-build .
 ### Kratos
 
 ```sh
+mkdir -p $GOPATH/src/github.com/ory/kratos
+cd $GOPATH/src/github.com/ory/kratos
+git clone https://github.com/ory/kratos.git .
 git checkout v0.5.5-alpha.1
 docker build -t ory-kratos:v0.5.5-alpha.1 -f .docker/Dockerfile-build .
 ```
 
-### Kratos self service UI
-
-```sh
-git checkout v0.5.5-alpha.1
-docker build -t ory-kratos-selfservice-ui-node:v0.5.5-alpha.1 .
-```
-
-### Mailslurper
-
-```
-git checkout master
-docker build -t ory-mailslurper:master -f Dockerfile-smtps .
-```
-
 ### Oathkeeper
 
+Right now, Oathkeeper is the only component not providing Docker based build:
+
 ```sh
+mkdir -p $GOPATH/src/github.com/ory/oathkeeper
+cd $GOPATH/src/github.com/ory/oathkeeper
+git clone https://github.com/ory/oathkeeper.git .
 git checkout v0.38.9-beta.1 # version 0.38.10-beta.1 doesn't build
 make deps
 ./.bin/packr2
@@ -45,6 +47,32 @@ CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
 docker build -t ory-oathkeeper:v0.38.9-beta.1 .
 rm oathkeeper
 ./.bin/packr2 clean
+```
+
+## Build additional components required by the Compose setup
+
+### Kratos self service UI
+
+This is an example browser facing application implementing login, registration, verification and link recovery flows:
+
+```sh
+mkdir -p $GOPATH/src/github.com/ory/kratos-selfservice-ui-node
+cd $GOPATH/src/github.com/ory/kratos-selfservice-ui-node
+git clone https://github.com/ory/kratos-selfservice-ui-node.git .
+git checkout v0.5.5-alpha.1
+docker build -t ory-kratos-selfservice-ui-node:v0.5.5-alpha.1 .
+```
+
+### Mailslurper
+
+Kratos always sends emails and mailslurper is a thin SMTP server used by the Compose:
+
+```
+mkdir -p $GOPATH/src/github.com/ory/mailslurper
+cd $GOPATH/src/github.com/ory/mailslurper
+git clone https://github.com/ory/mailslurper.git .
+git checkout master
+docker build -t ory-mailslurper:master -f Dockerfile-smtps .
 ```
 
 ## Run
@@ -55,11 +83,11 @@ docker run --rm -ti ory-oathkeeper:v0.38.9-beta.1 credentials generate --alg RS2
 docker-compose -f compose.yml up
 ```
 
-## Test that stuff works...
+## Test individual components
 
 ### Hydra
 
-Create the OAuth 2.0 Client:
+Create an OAuth 2.0 Client:
 
 ```sh
 docker-compose -f compose.yml exec hydra \
@@ -99,7 +127,9 @@ docker-compose -f compose.yml exec hydra \
 
 ### Keto
 
-Create local policy:
+The namespaces are defined in the `compose/configs/keto/keto.yml` file.
+
+Create a relation tuple:
 
 ```sh
 curl -XPUT --data '{
@@ -110,7 +140,7 @@ curl -XPUT --data '{
 }' http://localhost:4467/relation-tuples
 ```
 
-Check if policy has been created:
+Check if the tuple has been created:
 
 ```sh
 curl http://localhost:4466/relation-tuples?namespace=default-namespace
@@ -128,6 +158,8 @@ curl -XPOST --data '{
 ```
 
 ### Kratos
+
+Verify that Kratos is up:
 
 ```sh
 curl --silent http://localhost:4433/health/alive | jq '.'
@@ -150,6 +182,8 @@ Register an account and sign in.
 ![Self service Kratos UI signed in user](docs/aaa-setup-kratos-signed-in.png)
 
 ### Oathkeeper
+
+The rules are defined in `compose/configs/oathkeeper/rules.json` file. The `allow-anonymous-with-header-mutator` rule allows an unauthenticated access to the `http://127.0.0.1:4455/anything/header` URL. Here we validate that:
 
 ```sh
 curl -X GET http://127.0.0.1:4455/anything/header
@@ -178,7 +212,7 @@ Gives:
 }
 ```
 
-And:
+The `deny-anonymous` rule disallows anonymous access to the `http://127.0.0.1:4455/anything/deny` URL.
 
 ```sh
 curl --silent -H "Accept: application/json" -X GET http://127.0.0.1:4455/anything/deny | jq '.'
@@ -295,7 +329,7 @@ curl --silent -XPUT http://localhost:4445/oauth2/auth/requests/consent/accept?co
 }' | jq '.'
 ```
 
-The `session.id_token` property is how the additional claims can be passed to the ID token via user info. This behaviour is documented here: https://www.ory.sh/hydra/docs/concepts/openid-connect-oidc#userinfo.
+The `session.id_token` property is how the additional claims can be passed to the ID token via user info. This behaviour is documented here: https://www.ory.sh/hydra/docs/concepts/openid-connect-oidc#userinfo. This is the basic primitive for integrating Kratos and Hydra.
 
 The result will be another JSON like this:
 
