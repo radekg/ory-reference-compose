@@ -1,0 +1,88 @@
+serve:
+    proxy:
+        port: 4455 # run the proxy at port 4455
+    api:
+        port: 4456 # run the api at port 4456
+  
+access_rules:
+    matching_strategy: glob
+    repositories:
+        - file:///etc/config/oathkeeper/rules.json
+        - file:///etc/config/oathkeeper/kratos-selfservice.json
+  
+errors:
+    fallback:
+        - json
+    handlers:
+        json:
+            enabled: true
+            config:
+                verbose: true
+        redirect:
+            enabled: true
+            config:
+                to: https://www.ory.sh/docs
+  
+mutators:
+    header:
+        enabled: true
+        config:
+            headers:
+                X-User: "{{ print .Subject }}"
+    noop:
+        enabled: true
+    id_token:
+        enabled: true
+        config:
+            issuer_url: http://localhost:4455/
+            jwks_url: file:///etc/config/oathkeeper/jwks.json
+  
+authorizers:
+    allow:
+        enabled: true
+    deny:
+        enabled: true
+    remote_json:
+        # keto_engine_acp_ory is planned for deprecation:
+        # -> https://community.ory.sh/t/problems-with-configuration-of-keto-engine-acp-ory-authorizer/2079/2
+        # it is recommended to use remote_json.
+        # remote_json documentation: https://www.ory.sh/oathkeeper/docs/pipeline/authz#remote_json
+        enabled: true
+        config:
+            remote: http://keto:4466/check
+            # payload: |
+            #     {
+            #         "namespace": "default-namespace",
+            #         "subject": "{{ print .Subject }}",
+            #         "object": "token:and:keto",
+            #         #"relation": "{{ printIndex .MatchContext.RegexpCaptureGroups 0 }}"
+            #     }
+            payload: |
+                {
+                    "namespace": "...",
+                    "subject": "...",
+                    "object": "...",
+                    "relation": "..."
+                }
+
+authenticators:
+    cookie_session:
+        enabled: true
+        config:
+            check_session_url: http://kratos:4433/sessions/whoami
+            preserve_path: true
+            extra_from: "@this"
+            subject_from: "identity.id"
+            only:
+              - ory_kratos_session
+    noop:
+        enabled: true
+    anonymous:
+        enabled: true
+        config:
+            subject: guest
+    oauth2_introspection:
+        enabled: true
+        config:
+            introspection_url: http://hydra:4445/oauth2/introspect
+  

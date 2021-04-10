@@ -1,0 +1,36 @@
+serve:
+    cookies:
+        same_site_mode: Lax
+  
+urls:
+    self:
+        issuer: http://127.0.0.1:4444
+    consent: http://127.0.0.1:3000/consent
+    login: http://127.0.0.1:3000/login
+    logout: http://127.0.0.1:3000/logout
+  
+secrets:
+    system:
+    - youReallyNeedToChangeThis
+
+strategies:
+    access_token: jwt
+  
+oidc:
+    subject_identifiers:
+        supported_types:
+        - pairwise
+        - public
+        pairwise:
+            salt: youReallyNeedToChangeThis
+
+tracing:
+    provider: jaeger
+    service_name: Hydra
+    providers:
+        jaeger:
+            local_agent_address: jaeger:6831
+            sampling:
+                type: const
+                value: 1
+                server_url: http://jaeger:5778/sampling

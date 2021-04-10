@@ -1,0 +1,9 @@
+namespaces:
+  - id: 0
+    name: default-namespace
+
+serve:
+  write:
+    host: "0.0.0.0"
+  read:
+    host: "0.0.0.0"

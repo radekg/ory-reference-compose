@@ -1,0 +1,6 @@
+.DS_Store
+compose/configs/oathkeeper/jwks.json
+compose/psql/data/*
+!compose/psql/data/.gitkeep
+compose/psql/wal/*
+!compose/psql/wal/.gitkeep
