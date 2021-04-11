@@ -4,3 +4,5 @@ compose/psql/data/*
 !compose/psql/data/.gitkeep
 compose/psql/wal/*
 !compose/psql/wal/.gitkeep
+compose/configs/keto_namespaces/**
+!compose/configs/keto_namespaces/.gitkeep
