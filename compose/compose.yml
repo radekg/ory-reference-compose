@@ -65,7 +65,7 @@ services:
     kratos-migrate:
         depends_on:
             - psql
-        image: ory-kratos:v0.5.5-alpha.1
+        image: ory-kratos:v0.6.0-alpha.2
         restart: on-failure
         command:
             migrate -c /etc/config/kratos/kratos.yml sql -e --yes
@@ -138,7 +138,7 @@ services:
     kratos:
         depends_on:
             - kratos-migrate
-        image: ory-kratos:v0.5.5-alpha.1
+        image: ory-kratos:v0.6.0-alpha.2
         restart: unless-stopped
         command: serve -c /etc/config/kratos/kratos.yml --dev
         environment:
@@ -159,7 +159,7 @@ services:
     kratos-selfservice-ui-node:
         depends_on:
             - kratos
-        image: ory-kratos-selfservice-ui-node:v0.5.5-alpha.1
+        image: ory-kratos-selfservice-ui-node:v0.6.0-alpha.2
         environment:
             - JWKS_URL=http://oathkeeper:4456/.well-known/jwks.json
             - KRATOS_PUBLIC_URL=http://kratos:4433/
@@ -181,7 +181,7 @@ services:
     oathkeeper:
         depends_on:
             - psql
-        image: ory-oathkeeper:v0.38.9-beta.1
+        image: ory-oathkeeper:v0.38.10-beta.2
         restart: unless-stopped
         command: serve --config=/etc/config/oathkeeper/oathkeeper.yml
         environment:

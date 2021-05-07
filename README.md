@@ -28,8 +28,8 @@ docker build -t ory-keto:v0.6.0-alpha.1 -f .docker/Dockerfile-build .
 mkdir -p $GOPATH/src/github.com/ory/kratos
 cd $GOPATH/src/github.com/ory/kratos
 git clone https://github.com/ory/kratos.git .
-git checkout v0.5.5-alpha.1
-docker build -t ory-kratos:v0.5.5-alpha.1 -f .docker/Dockerfile-build .
+git checkout v0.6.0-alpha.2
+docker build -t ory-kratos:v0.6.0-alpha.2 -f .docker/Dockerfile-build .
 ```
 
 ### Oathkeeper
@@ -40,11 +40,11 @@ Right now, Oathkeeper is the only component not providing Docker based build:
 mkdir -p $GOPATH/src/github.com/ory/oathkeeper
 cd $GOPATH/src/github.com/ory/oathkeeper
 git clone https://github.com/ory/oathkeeper.git .
-git checkout v0.38.9-beta.1 # version 0.38.10-beta.1 doesn't build
+git checkout v0.38.10-beta.2
 make deps
 ./.bin/packr2
 CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
-docker build -t ory-oathkeeper:v0.38.9-beta.1 .
+docker build -t ory-oathkeeper:v0.38.10-beta.2 .
 rm oathkeeper
 ./.bin/packr2 clean
 ```
@@ -59,8 +59,8 @@ This is an example browser facing application implementing login, registration, 
 mkdir -p $GOPATH/src/github.com/ory/kratos-selfservice-ui-node
 cd $GOPATH/src/github.com/ory/kratos-selfservice-ui-node
 git clone https://github.com/ory/kratos-selfservice-ui-node.git .
-git checkout v0.5.5-alpha.1
-docker build -t ory-kratos-selfservice-ui-node:v0.5.5-alpha.1 .
+git checkout v0.6.0-alpha.2
+docker build -t ory-kratos-selfservice-ui-node:v0.6.0-alpha.2 .
 ```
 
 ### Mailslurper
@@ -79,7 +79,7 @@ docker build -t ory-mailslurper:master -f Dockerfile-smtps .
 
 ```sh
 cd compose/
-docker run --rm -ti ory-oathkeeper:v0.38.9-beta.1 credentials generate --alg RS256 > configs/oathkeeper/jwks.json
+docker run --rm -ti ory-oathkeeper:v0.38.10-beta.2 credentials generate --alg RS256 > configs/oathkeeper/jwks.json
 docker-compose -f compose.yml up
 ```
 

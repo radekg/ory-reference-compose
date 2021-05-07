@@ -1,54 +1,14 @@
-serve:
-    public:
-        base_url: http://127.0.0.1:4433/
-        cors:
-            enabled: true
-    admin:
-        base_url: http://kratos:4434/
+courier:
+    smtp:
+        connection_uri: smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
 
-selfservice:
-    default_browser_return_url: http://127.0.0.1:4455/
-    whitelisted_return_urls:
-        - http://127.0.0.1:4455
+hashers:
+    algorithm: bcrypt
+    bcrypt:
+        cost: 12
 
-    methods:
-        password:
-            enabled: true
-
-    flows:
-        error:
-            ui_url: http://127.0.0.1:4455/error
-
-        settings:
-            ui_url: http://127.0.0.1:4455/settings
-            privileged_session_max_age: 15m
-
-        recovery:
-            enabled: true
-            ui_url: http://127.0.0.1:4455/recovery
-
-        verification:
-            enabled: true
-            ui_url: http://127.0.0.1:4455/verify
-            after:
-                default_browser_return_url: http://127.0.0.1:4455/
-
-        logout:
-            after:
-                default_browser_return_url: http://127.0.0.1:4455/auth/login
-
-        login:
-            ui_url: http://127.0.0.1:4455/auth/login
-            lifespan: 10m
-
-        registration:
-            lifespan: 10m
-            ui_url: http://127.0.0.1:4455/auth/registration
-            after:
-                password:
-                    hooks:
-                        -
-                            hook: session
+identity:
+    default_schema_url: file:///etc/config/kratos/identity.schema.json
 
 log:
     level: debug
@@ -59,17 +19,70 @@ secrets:
     cookie:
         - PLEASE-CHANGE-ME-I-AM-VERY-INSECURE
 
-hashers:
-    argon2:
-        parallelism: 1
-        memory: 131072
-        iterations: 2
-        salt_length: 16
-        key_length: 16
+selfservice:
+    default_browser_return_url: http://127.0.0.1:4455/
+    whitelisted_return_urls:
+        - http://127.0.0.1:4455
+    methods:
+        password:
+            enabled: true
+    flows:
+        error:
+            ui_url: http://127.0.0.1:4455/error
+        settings:
+            ui_url: http://127.0.0.1:4455/settings
+            privileged_session_max_age: 15m
+        recovery:
+            enabled: true
+            ui_url: http://127.0.0.1:4455/recovery
+        verification:
+            enabled: true
+            ui_url: http://127.0.0.1:4455/verify
+            after:
+                default_browser_return_url: http://127.0.0.1:4455/
+        logout:
+            after:
+                default_browser_return_url: http://127.0.0.1:4455/auth/login
+        login:
+            ui_url: http://127.0.0.1:4455/auth/login
+            lifespan: 10m
+        registration:
+            lifespan: 10m
+            ui_url: http://127.0.0.1:4455/auth/registration
+            after:
+                password:
+                    hooks:
+                        - hook: session
 
-identity:
-    default_schema_url: file:///etc/config/kratos/identity.schema.json
+serve:
+    public:
+        base_url: http://127.0.0.1:4433/
+        cors:
+            allowed_origins:
+                - http://127.0.0.1:4455
+            allowed_methods:
+                - POST
+                - GET
+                - PUT
+                - PATCH
+                - DELETE
+            allowed_headers:
+                - Authorization
+                - Cookie
+                - Content-Type
+                - X-Session-Token
+            exposed_headers:
+                - Content-Type
+                - Set-Cookie
+            allow_credentials: true
+            options_passthrough: false
+            debug: true
+            enabled: true
+        host: "0.0.0.0"
+        port: 4433
+    admin:
+        base_url: http://kratos:4434/
+        host: "0.0.0.0"
+        port: 4434
 
-courier:
-    smtp:
-        connection_uri: smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
+sqa-opt-out: false
