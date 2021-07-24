@@ -43,20 +43,12 @@ authorizers:
     deny:
         enabled: true
     remote_json:
-        # keto_engine_acp_ory is planned for deprecation:
-        # -> https://community.ory.sh/t/problems-with-configuration-of-keto-engine-acp-ory-authorizer/2079/2
-        # it is recommended to use remote_json.
         # remote_json documentation: https://www.ory.sh/oathkeeper/docs/pipeline/authz#remote_json
         enabled: true
         config:
             remote: http://keto:4466/check
-            # payload: |
-            #     {
-            #         "namespace": "default-namespace",
-            #         "subject": "{{ print .Subject }}",
-            #         "object": "token:and:keto",
-            #         #"relation": "{{ printIndex .MatchContext.RegexpCaptureGroups 0 }}"
-            #     }
+            # must be set explicitly, otherwise: https://github.com/ory/oathkeeper/issues/797
+            forward_response_headers_to_upstream: []
             payload: |
                 {
                     "namespace": "...",
