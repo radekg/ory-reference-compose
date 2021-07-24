@@ -8,8 +8,8 @@ Clone and build individual components:
 mkdir -p $GOPATH/src/github.com/ory/hydra
 cd $GOPATH/src/github.com/ory/hydra
 git clone https://github.com/ory/hydra.git .
-git checkout v1.10.2
-docker build -t ory-hydra:v1.10.2 -f .docker/Dockerfile-build .
+git checkout v1.10.3
+docker build -t ory-hydra:v1.10.3 -f .docker/Dockerfile-build .
 ```
 
 ### Keto
@@ -28,8 +28,8 @@ docker build -t ory-keto:v0.6.0-alpha.3 -f .docker/Dockerfile-build .
 mkdir -p $GOPATH/src/github.com/ory/kratos
 cd $GOPATH/src/github.com/ory/kratos
 git clone https://github.com/ory/kratos.git .
-git checkout v0.6.2-alpha.1
-docker build -t ory-kratos:v0.6.2-alpha.1 -f .docker/Dockerfile-build .
+git checkout v0.7.1-alpha.1
+docker build -t ory-kratos:v0.7.1-alpha.1 -f .docker/Dockerfile-build .
 ```
 
 ### Oathkeeper
@@ -40,13 +40,8 @@ Right now, Oathkeeper is the only component not providing Docker based build:
 mkdir -p $GOPATH/src/github.com/ory/oathkeeper
 cd $GOPATH/src/github.com/ory/oathkeeper
 git clone https://github.com/ory/oathkeeper.git .
-git checkout v0.38.11-beta.1
-make .bin/packr2
-./.bin/packr2
-CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
-docker build -t ory-oathkeeper:v0.38.11-beta.1 .
-rm oathkeeper
-./.bin/packr2 clean
+git checkout v0.38.14-beta.1
+docker build -t ory-kratos:v0.38.14-beta.1 -f Dockerfile-dc .
 ```
 
 ## Build additional components required by the Compose setup
@@ -59,8 +54,8 @@ This is an example browser facing application implementing login, registration, 
 mkdir -p $GOPATH/src/github.com/ory/kratos-selfservice-ui-node
 cd $GOPATH/src/github.com/ory/kratos-selfservice-ui-node
 git clone https://github.com/ory/kratos-selfservice-ui-node.git .
-git checkout v0.6.2-alpha.1
-docker build -t ory-kratos-selfservice-ui-node:v0.6.2-alpha.1 .
+git checkout v0.7.1-alpha.1
+docker build -t ory-kratos-selfservice-ui-node:v0.7.1-alpha.1 .
 ```
 
 ### Mailslurper
@@ -79,7 +74,7 @@ docker build -t ory-mailslurper:master -f Dockerfile-smtps .
 
 ```sh
 cd compose/
-docker run --rm -ti ory-oathkeeper:v0.38.11-beta.1 credentials generate --alg RS256 > configs/oathkeeper/jwks.json
+docker run --rm -ti ory-oathkeeper:v0.38.14-beta.1 credentials generate --alg RS256 > configs/oathkeeper/jwks.json
 docker-compose -f compose.yml up
 ```
 
