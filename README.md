@@ -41,12 +41,7 @@ mkdir -p $GOPATH/src/github.com/ory/oathkeeper
 cd $GOPATH/src/github.com/ory/oathkeeper
 git clone https://github.com/ory/oathkeeper.git .
 git checkout v0.38.14-beta.1
-make .bin/packr2
-./.bin/packr2
-CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
-docker build -t ory-oathkeeper:v0.38.14-beta.1 .
-rm oathkeeper
-./.bin/packr2 clean
+docker build -t ory-kratos:v0.38.14-beta.1 -f Dockerfile-dc .
 ```
 
 ## Build additional components required by the Compose setup
